@@ -1,50 +1,60 @@
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${import.meta.env.VITE_GEMINI_API_KEY}`;
+const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
-async function callGemini(prompt) {
-  const res = await fetch(GEMINI_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { 
-        temperature: 0.3, 
-        maxOutputTokens: 4000,
-        responseMimeType: "application/json"
-      }
-    })
-  });
-  
-  const data = await res.json();
-  
-  if (!res.ok) {
-    throw new Error(`Gemini API error: ${data.error?.message || res.status}`);
-  }
-  
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-  console.log('Gemini raw response length:', text.length);
-  console.log('Gemini response preview:', text.substring(0, 200));
-  
-  // Clean and extract JSON
-  const cleaned = text
-    .replace(/```json/g, '')
-    .replace(/```/g, '')
-    .trim();
-  
-  const first = cleaned.indexOf('{');
-  const last = cleaned.lastIndexOf('}');
-  
-  if (first === -1 || last === -1) {
-    throw new Error('No JSON object found in Gemini response');
-  }
-  
-  const jsonStr = cleaned.substring(first, last + 1);
-  
+async function callAI(prompt) {
+  // Try Gemini first
   try {
-    return JSON.parse(jsonStr);
-  } catch(e) {
-    console.error('JSON parse failed:', e.message);
-    console.error('JSON string:', jsonStr.substring(0, 500));
-    throw new Error('Failed to parse Gemini response as JSON');
+    const res = await fetch(GEMINI_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { 
+          temperature: 0.3, 
+          maxOutputTokens: 4000,
+          responseMimeType: "application/json"
+        }
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error?.message || 'Gemini failed');
+    
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const first = text.indexOf('{');
+    const last = text.lastIndexOf('}');
+    if (first === -1) throw new Error('No JSON in Gemini response');
+    return JSON.parse(text.substring(first, last + 1));
+    
+  } catch (geminiError) {
+    console.log('Gemini failed, trying Groq...', geminiError.message);
+    
+    // Fallback to Groq
+    const res = await fetch(GROQ_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${import.meta.env.VITE_GROQ_API_KEY}` 
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [
+          { role: 'system', content: 'You are a JSON generator. Return ONLY a valid JSON object, no markdown.' },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0.3,
+        max_tokens: 4000
+      })
+    });
+    
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error?.message || 'Groq failed');
+    
+    const content = data.choices?.[0]?.message?.content || '';
+    const first = content.indexOf('{');
+    const last = content.lastIndexOf('}');
+    if (first === -1) throw new Error('No JSON in Groq response');
+    
+    return JSON.parse(content.substring(first, last + 1));
   }
 }
 
@@ -76,7 +86,7 @@ Return this exact JSON structure:
     {"title": "Fix title 5 words", "detail": "specific action under 20 words", "priority": "P1", "owner": "Support"}
   ]
 }`;
-  return callGemini(prompt);
+  return callAI(prompt);
 }
 
 export async function generateEmail({ pulse, totalReviews, avgRating, negativeCount, weekLabel }) {
@@ -93,5 +103,5 @@ Use this data:
 
 Email format:
 Hi Team,\\n\\nHere's this week's pulse for ${weekLabel} based on ${totalReviews} reviews (avg ${parseFloat(avgRating).toFixed(1)}/5, ${Math.round(negativeCount/totalReviews*100)}% negative):\\n\\n🔝 Top Themes\\n• [theme 1 name]: [insight]\\n• [theme 2 name]: [insight]\\n• [theme 3 name]: [insight]\\n\\n💬 What Users Are Saying\\n• "[quote 1]"\\n• "[quote 2]"\\n\\n🚀 Recommended Actions\\n1. [action 1 title]: [detail] ([owner])\\n2. [action 2 title]: [detail] ([owner])\\n3. [action 3 title]: [detail] ([owner])\\n\\n📌 Key Insight\\n[summary]\\n\\n🔗 Full dashboard: https://your-app.vercel.app\\nLast updated: April 2026 (Auto-generated. No PII included.)\\n\\nBest,\\nProduct Intelligence Team\\nGroww`;
-  return callGemini(prompt);
+  return callAI(prompt);
 }
