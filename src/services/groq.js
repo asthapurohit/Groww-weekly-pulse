@@ -57,7 +57,7 @@ export async function generatePulse({
     const apiKey = import.meta.env.VITE_GROQ_API_KEY;
     console.log("KEY:", apiKey);
     console.log("ALL ENV:", JSON.stringify(import.meta.env));
-    const systemMessage = "You are a senior product analyst. Return only valid JSON, no markdown, no explanation.";
+    const systemMessage = "You are a senior product analyst. Return only valid JSON, no markdown, no explanation. For quotes: NEVER write 'no positive quotes found' — always pick actual text from the sample reviews provided. Quote text must be real words from the reviews, not placeholder text. If no 4-5 star reviews exist in samples, use the mildest 3-star review as the third quote.";
     
     const userMessage = `Analyze this app store data for ${weekLabel} and return a JSON object with the following structure:
 {
@@ -71,12 +71,10 @@ export async function generatePulse({
     }
   ] x3,
   "quotes": [
-    {
-      "text": "Direct quote from review",
-      "themeId": "theme-id",
-      "rating": review_rating
-    }
-  ] x3,
+    {"text": "specific complaint under 15 words from the sample reviews", "themeId": "payments-sip", "rating": 1},
+    {"text": "another specific complaint under 15 words", "themeId": "app-ux-support", "rating": 2},
+    {"text": "if no positive reviews exist, pick the least negative review text", "themeId": "app-ux-support", "rating": 3}
+  ]
   "actions": [
     {
       "title": "Action title",

@@ -132,23 +132,12 @@ export const THEMES = [
     color: '#A29BFE',
     icon: '📱',
     keywords: [
-      'app', 'application', 'crash', 'slow', 'support',
-      'customer', 'service', 'interface', 'ui', 'ux',
-      'notification', 'freeze', 'lag', 'speed', 'update',
-      'feature', 'button', 'screen', 'response', 'feedback',
-      'improve', 'issue', 'problem', 'error', 'bug', 'fix',
-      'work', 'working', 'not working', 'customer care',
-      'helpline', 'query', 'resolve', 'chat', 'reply',
-      'good', 'best', 'nice', 'excellent', 'great', 'super',
-      'bad', 'worst', 'poor', 'terrible', 'awesome', 'worst',
-      'easy', 'simple', 'fast', 'quick', 'smooth', 'clean',
-      'platform', 'groww', 'performance', 'experience',
-      'recommend', 'rating', 'review', 'user', 'interface',
-      'design', 'layout', 'navigation', 'menu', 'page',
-      'load', 'loading', 'open', 'close', 'install',
-      'uninstall', 'version', 'latest', 'new', 'old',
-      'management', 'team', 'company', 'service',
-      'faltu', 'jaberdast', 'achcha', 'bahut', 'bahut accha'
+      'crash', 'slow', 'freeze', 'lag', 'customer support',
+      'notification', 'bug', 'error', 'not working',
+      'helpline', 'chat support', 'reply', 'response',
+      'feature', 'button', 'screen', 'feedback', 'issue',
+      'fix', 'work', 'interface', 'ui', 'ux',
+      'update', 'speed', 'performance', 'experience'
     ]
   }
 ];
