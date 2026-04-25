@@ -2,7 +2,7 @@ import React from 'react';
 import { LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import StatsBar from './StatsBar';
 
-const Dashboard = ({ processedReviews, themeCounts, totalReviews, analysedCount, avgRating, negativeCount, isMobile }) => {
+const Dashboard = ({ processedReviews, themeCounts, totalReviews, analysedCount, avgRating, negativeCount, isMobile, lastUpdated }) => {
   // Fake trend data for 8 weeks
   const trendData = [
     { week: 'W1', kyc: 12, payments: 8, withdrawals: 5 },
@@ -276,6 +276,12 @@ const Dashboard = ({ processedReviews, themeCounts, totalReviews, analysedCount,
           </div>
         </div>
       </div>
+      
+      {lastUpdated && (
+        <div style={{fontSize: 11, color: '#9CA3AF', fontFamily: 'monospace', textAlign: 'center', marginTop: '20px'}}>
+          Last scraped: {lastUpdated}
+        </div>
+      )}
     </div>
   );
 };

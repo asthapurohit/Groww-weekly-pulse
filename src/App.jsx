@@ -78,9 +78,10 @@ const [loadingStep, setLoadingStep] = useState(0);
   const [emailLoading, setEmailLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState(null);
+  const [lastUpdated, setLastUpdated] = useState(null);
 
   useEffect(() => {
-  loadReviews().then(async ({ reviews: rawReviews, totalScraped }) => {
+  loadReviews().then(async ({ reviews: rawReviews, totalScraped, lastUpdated }) => {
     setDataLoading(true);
     
     // Step 1: Load reviews
@@ -122,6 +123,7 @@ const [loadingStep, setLoadingStep] = useState(0);
     setAnalysedCount(rawReviews.length);  // shows 1,000 in analysis
     setAvgRating(avg);
     setNegativeCount(negative);
+    setLastUpdated(lastUpdated);
     setDataLoading(false);
     
   }).catch(err => {
@@ -224,6 +226,7 @@ const [loadingStep, setLoadingStep] = useState(0);
             avgRating={avgRating}
             negativeCount={negativeCount}
             isMobile={isMobile}
+            lastUpdated={lastUpdated}
           />
         );
       

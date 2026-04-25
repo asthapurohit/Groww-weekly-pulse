@@ -39,10 +39,18 @@ export async function loadReviews() {
         const totalScraped = allReviews.length;
         const withText = allReviews.filter(r => r.text.length > 0);
         
+        const mostRecentDate = withText
+          .map(r => r.date)
+          .sort()
+          .reverse()[0];
+        
         console.log(`Total scraped: ${totalScraped}, With text: ${withText.length}`);
         
-        // Return object with both counts
-        return { reviews: withText, totalScraped };
+        return { 
+          reviews: withText, 
+          totalScraped,
+          lastUpdated: mostRecentDate 
+        };
       }
     } catch (e) {
       continue;
