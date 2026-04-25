@@ -1,61 +1,38 @@
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${import.meta.env.VITE_GEMINI_API_KEY}`;
-const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
-
 async function callAI(prompt) {
-  // Try Gemini first
-  try {
-    const res = await fetch(GEMINI_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { 
-          temperature: 0.3, 
-          maxOutputTokens: 4000,
-          responseMimeType: "application/json"
-        }
-      })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error?.message || 'Gemini failed');
-    
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    const first = text.indexOf('{');
-    const last = text.lastIndexOf('}');
-    if (first === -1) throw new Error('No JSON in Gemini response');
-    return JSON.parse(text.substring(first, last + 1));
-    
-  } catch (geminiError) {
-    console.log('Gemini failed, trying Groq...', geminiError.message);
-    
-    // Fallback to Groq
-    const res = await fetch(GROQ_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${import.meta.env.VITE_GROQ_API_KEY}` 
-      },
-      body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
-        messages: [
-          { role: 'system', content: 'You are a JSON generator. Return ONLY a valid JSON object, no markdown.' },
-          { role: 'user', content: prompt }
-        ],
-        temperature: 0.3,
-        max_tokens: 4000
-      })
-    });
-    
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error?.message || 'Groq failed');
-    
-    const content = data.choices?.[0]?.message?.content || '';
-    const first = content.indexOf('{');
-    const last = content.lastIndexOf('}');
-    if (first === -1) throw new Error('No JSON in Groq response');
-    
-    return JSON.parse(content.substring(first, last + 1));
+  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${import.meta.env.VITE_GROQ_API_KEY}` 
+    },
+    body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      messages: [
+        { role: 'system', content: 'Return only valid JSON, no markdown, no explanation.' },
+        { role: 'user', content: prompt }
+      ],
+      temperature: 0.3,
+      max_tokens: 4000
+    })
+  });
+
+  const data = await res.json();
+  
+  if (!res.ok) {
+    throw new Error(`API error ${res.status}: ${data.error?.message}`);
   }
+
+  const text = data.choices?.[0]?.message?.content || '';
+  console.log('Response length:', text.length);
+  
+  const first = text.indexOf('{');
+  const last = text.lastIndexOf('}');
+  
+  if (first === -1 || last === -1) {
+    throw new Error('No JSON found in response');
+  }
+  
+  return JSON.parse(text.substring(first, last + 1));
 }
 
 export async function generatePulse({ topThemes, sampleReviews, totalReviews, avgRating, negativeCount, weekLabel }) {
