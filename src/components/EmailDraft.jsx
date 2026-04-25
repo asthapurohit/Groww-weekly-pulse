@@ -1,5 +1,5 @@
 import React from 'react';
-import { generateEmail } from '../services/groq';
+import { generateEmail } from '../services/gemini';
 
 const EmailDraft = ({ emailData, loading, onGenerateEmail, onCopyEmail, error, isMobile }) => {
   const sendEmail = () => {

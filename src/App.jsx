@@ -5,7 +5,7 @@ import { loadReviews, THEMES, assignTheme, WEEK_LABEL } from './data/reviews';
 import { classifyReviewsWithAI } from './services/themeClassifier';
 
 // Service imports
-import { generatePulse, generateEmail } from './services/groq';
+import { generatePulse, generateEmail } from './services/gemini';
 
 // Component imports
 import Sidebar from './components/Sidebar';

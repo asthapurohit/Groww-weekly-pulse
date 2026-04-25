@@ -3,6 +3,29 @@
 const GROQ_BASE_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const GROQ_MODEL = 'llama-3.3-70b-versatile';
 
+async function fetchWithRetry(body, maxRetries = 3) {
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    const response = await fetch(GROQ_BASE_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${import.meta.env.VITE_GROQ_API_KEY}` 
+      },
+      body: JSON.stringify(body)
+    });
+
+    if (response.status === 429) {
+      const waitTime = (attempt + 1) * 15000;
+      console.log(`Rate limited. Waiting ${waitTime/1000}s before retry ${attempt + 1}/${maxRetries}...`);
+      await new Promise(r => setTimeout(r, waitTime));
+      continue;
+    }
+
+    return response;
+  }
+  throw new Error('Rate limit exceeded after retries. Please wait 1 minute and try again.');
+}
+
 /**
  * Generate product pulse analysis using Groq API
  * @param {Object} params - Analysis parameters
@@ -71,21 +94,14 @@ Data:
 - Average rating: ${avgRating}
 - Negative reviews: ${negativeCount}`;
 
-    const response = await fetch(GROQ_BASE_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${import.meta.env.VITE_GROQ_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: GROQ_MODEL,
-        messages: [
-          { role: 'system', content: systemMessage },
-          { role: 'user', content: userMessage }
-        ],
-        temperature: 0.3,
-        max_tokens: 2000
-      })
+    const response = await fetchWithRetry({
+      model: GROQ_MODEL,
+      messages: [
+        { role: 'system', content: systemMessage },
+        { role: 'user', content: userMessage }
+      ],
+      temperature: 0.3,
+      max_tokens: 2000
     });
 
     if (!response.ok) {
@@ -180,21 +196,14 @@ RULES:
 - No changes to the structure or emojis
 - Body under 250 words`;
 
-    const response = await fetch(GROQ_BASE_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${import.meta.env.VITE_GROQ_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: GROQ_MODEL,
-        messages: [
-          { role: 'system', content: systemMessage },
-          { role: 'user', content: userMessage }
-        ],
-        temperature: 0.4,
-        max_tokens: 1000
-      })
+    const response = await fetchWithRetry({
+      model: GROQ_MODEL,
+      messages: [
+        { role: 'system', content: systemMessage },
+        { role: 'user', content: userMessage }
+      ],
+      temperature: 0.4,
+      max_tokens: 1000
     });
 
     if (!response.ok) {
