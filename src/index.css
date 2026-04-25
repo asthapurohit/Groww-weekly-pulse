@@ -38,3 +38,15 @@ button {
   50% { width: 85%; }
   100% { width: 100%; }
 }
+
+@media (max-width: 768px) {
+  body { 
+    font-size: 14px; 
+  }
+  
+  @keyframes loadingBar {
+    0% { width: 0%; }
+    50% { width: 85%; }
+    100% { width: 100%; }
+  }
+}

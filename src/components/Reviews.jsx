@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 
-const Reviews = ({ reviews }) => {
+const Reviews = ({ reviews, isMobile }) => {
   // Null check for reviews
   if (!reviews || reviews.length === 0) return (
     <div style={{padding: 40, textAlign: 'center', color: '#888'}}>
@@ -128,7 +128,9 @@ const Reviews = ({ reviews }) => {
         backgroundColor: '#F3F4F6',
         padding: '4px',
         borderRadius: '8px',
-        width: 'fit-content'
+        width: 'fit-content',
+        overflowX: 'auto',
+        whiteSpace: 'nowrap'
       }}>
         {[
           { id: 'all', label: 'All Reviews', count: reviews.length },
@@ -186,7 +188,7 @@ const Reviews = ({ reviews }) => {
             <thead>
               <tr style={{ backgroundColor: '#F9FAFB', borderBottom: '1px solid #E5E7EB' }}>
                 <th style={{
-                  padding: '16px',
+                  padding: isMobile ? '10px 8px' : '16px',
                   textAlign: 'left',
                   fontSize: '12px',
                   fontWeight: '600',
@@ -197,7 +199,7 @@ const Reviews = ({ reviews }) => {
                   Rating
                 </th>
                 <th style={{
-                  padding: '16px',
+                  padding: isMobile ? '10px 8px' : '16px',
                   textAlign: 'left',
                   fontSize: '12px',
                   fontWeight: '600',
@@ -208,29 +210,31 @@ const Reviews = ({ reviews }) => {
                   Review
                 </th>
                 <th style={{
-                  padding: '16px',
+                  padding: isMobile ? '10px 8px' : '16px',
                   textAlign: 'left',
                   fontSize: '12px',
                   fontWeight: '600',
                   color: '#6B7280',
                   textTransform: 'uppercase',
-                  letterSpacing: '0.05em'
+                  letterSpacing: '0.05em',
+                  display: isMobile ? 'none' : 'table-cell'
                 }}>
                   Date
                 </th>
                 <th style={{
-                  padding: '16px',
+                  padding: isMobile ? '10px 8px' : '16px',
                   textAlign: 'left',
                   fontSize: '12px',
                   fontWeight: '600',
                   color: '#6B7280',
                   textTransform: 'uppercase',
-                  letterSpacing: '0.05em'
+                  letterSpacing: '0.05em',
+                  display: isMobile ? 'none' : 'table-cell'
                 }}>
                   Source
                 </th>
                 <th style={{
-                  padding: '16px',
+                  padding: isMobile ? '10px 8px' : '16px',
                   textAlign: 'left',
                   fontSize: '12px',
                   fontWeight: '600',
@@ -259,12 +263,12 @@ const Reviews = ({ reviews }) => {
                         e.currentTarget.style.backgroundColor = 'white';
                       }}
                     >
-                      <td style={{ padding: '16px' }}>
+                      <td style={{ padding: isMobile ? '10px 8px' : '16px' }}>
                         <div style={{ fontSize: '14px' }}>
                           {renderStars(review.rating || 0)}
                         </div>
                       </td>
-                  <td style={{ padding: '16px' }}>
+                  <td style={{ padding: isMobile ? '10px 8px' : '16px' }}>
                     <div style={{
                       fontSize: '14px',
                       color: '#374151',
@@ -274,7 +278,10 @@ const Reviews = ({ reviews }) => {
                       {truncateText(review.text)}
                     </div>
                   </td>
-                  <td style={{ padding: '16px' }}>
+                  <td style={{ 
+                    padding: isMobile ? '10px 8px' : '16px',
+                    display: isMobile ? 'none' : 'table-cell'
+                  }}>
                     <div style={{
                       fontSize: '14px',
                       color: '#6B7280'
@@ -282,7 +289,10 @@ const Reviews = ({ reviews }) => {
                       {review.date}
                     </div>
                   </td>
-                  <td style={{ padding: '16px' }}>
+                  <td style={{ 
+                    padding: isMobile ? '10px 8px' : '16px',
+                    display: isMobile ? 'none' : 'table-cell'
+                  }}>
                     <div style={{
                       fontSize: '14px',
                       color: '#6B7280'
@@ -290,7 +300,7 @@ const Reviews = ({ reviews }) => {
                       {(review.platform === 'Android' ? 'Play Store' : 'App Store')}
                     </div>
                   </td>
-                  <td style={{ padding: '16px' }}>
+                  <td style={{ padding: isMobile ? '10px 8px' : '16px' }}>
                     <div style={{
                       display: 'inline-block',
                       padding: '4px 8px',
@@ -321,7 +331,7 @@ const Reviews = ({ reviews }) => {
             justifyContent: 'center',
             alignItems: 'center',
             gap: '8px',
-            padding: '16px',
+            padding: isMobile ? '10px 8px' : '16px',
             borderTop: '1px solid #E5E7EB'
           }}>
             <button

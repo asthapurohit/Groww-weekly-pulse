@@ -1,0 +1,30 @@
+name: Weekly Review Scraper
+on:
+  schedule:
+    - cron: '0 9 * * 1'  # Every Monday 9am
+  workflow_dispatch:       # Manual trigger too
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          
+      - name: Install dependencies
+        run: npm install
+        
+      - name: Run scraper
+        run: node scrape.mjs
+        
+      - name: Commit new CSV
+        run: |
+          git config user.email "bot@groww.in"
+          git config user.name "Review Bot"
+          git add public/groww_real_reviews.csv
+          git commit -m "chore: weekly review update $(date +%Y-%m-%d)"
+          git push

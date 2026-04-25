@@ -1,7 +1,7 @@
 import React from 'react';
 import { generateEmail } from '../services/groq';
 
-const EmailDraft = ({ emailData, loading, onGenerateEmail, onCopyEmail, error }) => {
+const EmailDraft = ({ emailData, loading, onGenerateEmail, onCopyEmail, error, isMobile }) => {
   const sendEmail = () => {
     const subject = encodeURIComponent('Weekly Review Insights - Groww App');
     const body = encodeURIComponent(emailData?.body || '');
@@ -218,14 +218,14 @@ const EmailDraft = ({ emailData, loading, onGenerateEmail, onCopyEmail, error })
       {/* Two Column Layout */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: '3fr 2fr',
+        gridTemplateColumns: isMobile ? '1fr' : '3fr 2fr',
         gap: '24px'
       }}>
         {/* Left Column: Email Preview (60%) */}
         <div style={{
           backgroundColor: 'white',
           borderRadius: '12px',
-          padding: '32px',
+          padding: isMobile ? '20px' : '32px',
           boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
           border: '1px solid #E5E7EB'
         }}>

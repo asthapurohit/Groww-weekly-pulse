@@ -2,7 +2,7 @@ import React from 'react';
 import { LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import StatsBar from './StatsBar';
 
-const Dashboard = ({ processedReviews, themeCounts, totalReviews, analysedCount, avgRating, negativeCount }) => {
+const Dashboard = ({ processedReviews, themeCounts, totalReviews, analysedCount, avgRating, negativeCount, isMobile }) => {
   // Fake trend data for 8 weeks
   const trendData = [
     { week: 'W1', kyc: 12, payments: 8, withdrawals: 5 },
@@ -36,7 +36,7 @@ const Dashboard = ({ processedReviews, themeCounts, totalReviews, analysedCount,
     <div style={{
       backgroundColor: 'white',
       borderRadius: '12px',
-      padding: '24px',
+      padding: isMobile ? '14px' : '24px',
       boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
       border: '1px solid #E5E7EB'
     }}>
@@ -119,7 +119,7 @@ const Dashboard = ({ processedReviews, themeCounts, totalReviews, analysedCount,
         </h2>
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
+          gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
           gap: '20px'
         }}>
           {topThemes.map((theme, index) => (
@@ -181,14 +181,14 @@ const Dashboard = ({ processedReviews, themeCounts, totalReviews, analysedCount,
       {/* Charts Row */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: '2fr 1fr',
+        gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr',
         gap: '20px'
       }}>
         {/* Trend Over Time */}
         <div style={{
           backgroundColor: 'white',
           borderRadius: '12px',
-          padding: '24px',
+          padding: isMobile ? '14px' : '24px',
           boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
           border: '1px solid #E5E7EB'
         }}>
@@ -200,7 +200,7 @@ const Dashboard = ({ processedReviews, themeCounts, totalReviews, analysedCount,
           }}>
             Trend Over Time
           </h2>
-          <ResponsiveContainer width="100%" height={300}>
+          <ResponsiveContainer width="100%" height={isMobile ? 200 : 300}>
             <LineChart data={trendData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
               <XAxis dataKey="week" stroke="#6B7280" />
@@ -218,7 +218,7 @@ const Dashboard = ({ processedReviews, themeCounts, totalReviews, analysedCount,
         <div style={{
           backgroundColor: 'white',
           borderRadius: '12px',
-          padding: '24px',
+          padding: isMobile ? '14px' : '24px',
           boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
           border: '1px solid #E5E7EB'
         }}>
@@ -230,7 +230,7 @@ const Dashboard = ({ processedReviews, themeCounts, totalReviews, analysedCount,
           }}>
             Sentiment Overview
           </h2>
-          <ResponsiveContainer width="100%" height={300}>
+          <ResponsiveContainer width="100%" height={isMobile ? 200 : 300}>
             <PieChart>
               <Pie
                 data={sentimentData}

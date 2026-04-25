@@ -46,6 +46,15 @@ const parseCSV = (csvText) => {
 };
 
 function App() {
+  // Mobile detection
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // Navigation state
   const [activePage, setActivePage] = useState('dashboard'); // dashboard | reviews | themes | pulse | email | reports | settings
   
@@ -214,12 +223,13 @@ const [loadingStep, setLoadingStep] = useState(0);
             analysedCount={analysedCount}
             avgRating={avgRating}
             negativeCount={negativeCount}
+            isMobile={isMobile}
           />
         );
       
       case 'reviews':
         return (
-          <Reviews reviews={processedReviews} />
+          <Reviews reviews={processedReviews} isMobile={isMobile} />
         );
       
       case 'themes':
@@ -228,6 +238,7 @@ const [loadingStep, setLoadingStep] = useState(0);
             themeCounts={themeCounts}
             totalReviews={totalReviews}
             processedReviews={processedReviews}
+            isMobile={isMobile}
           />
         );
       
@@ -250,6 +261,7 @@ const [loadingStep, setLoadingStep] = useState(0);
               handleGenerateEmail();
               setActivePage('email');
             }}
+            isMobile={isMobile}
           />
         );
       
@@ -265,11 +277,12 @@ const [loadingStep, setLoadingStep] = useState(0);
               }
             }}
             error={error}
+            isMobile={isMobile}
           />
         );
       
       case 'reports':
-        return <Reports />;
+        return <Reports isMobile={isMobile} />;
       
       case 'settings':
         return (
@@ -355,16 +368,49 @@ const [loadingStep, setLoadingStep] = useState(0);
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#F4F6FA' }}>
-      <Sidebar activePage={activePage} onPageChange={handlePageChange} />
+      {!isMobile && <Sidebar activePage={activePage} onPageChange={handlePageChange} />}
       
       <div style={{
-        marginLeft: '220px',
+        marginLeft: isMobile ? 0 : '220px',
         flex: 1,
-        padding: '32px',
+        padding: isMobile ? '16px 12px 80px 12px' : '32px',
         overflowY: 'auto'
       }}>
         {renderMainContent()}
       </div>
+
+      {/* Mobile Bottom Navigation */}
+      {isMobile && (
+        <div style={{
+          position: 'fixed', bottom: 0, left: 0, right: 0,
+          background: 'white', borderTop: '1px solid #E5E7EB',
+          display: 'flex', justifyContent: 'space-around',
+          padding: '8px 4px 16px', zIndex: 1000,
+          boxShadow: '0 -4px 12px rgba(0,0,0,0.08)'
+        }}>
+          {[
+            { id: 'dashboard', icon: '📊', label: 'Home' },
+            { id: 'reviews',   icon: '💬', label: 'Reviews' },
+            { id: 'themes',    icon: '🎯', label: 'Themes' },
+            { id: 'pulse',     icon: '📈', label: 'Pulse' },
+            { id: 'email',     icon: '✉️', label: 'Email' },
+          ].map(item => (
+            <div key={item.id} onClick={() => handlePageChange(item.id)}
+              style={{
+                display: 'flex', flexDirection: 'column',
+                alignItems: 'center', gap: 2, cursor: 'pointer',
+                padding: '4px 10px', borderRadius: 8,
+                background: activePage === item.id ? '#F3F4F6' : 'transparent'
+              }}>
+              <span style={{ fontSize: 22 }}>{item.icon}</span>
+              <span style={{ fontSize: 10, fontWeight: activePage === item.id ? 700 : 400,
+                color: activePage === item.id ? '#1a1a2e' : '#9CA3AF' }}>
+                {item.label}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -3,36 +3,53 @@
 export const WEEK_LABEL = "Apr 11 – Apr 23, 2026";
 
 export async function loadReviews() {
-  const res = await fetch('/groww_real_reviews.csv');
-  const text = await res.text();
-  const lines = text.trim().split('\n');
-  
-  const allReviews = lines.slice(1).map((line, idx) => {
-    const vals = [];
-    let cur = '', inQ = false;
-    for (let c of line) {
-      if (c === '"') { inQ = !inQ; continue; }
-      if (c === ',' && !inQ) { vals.push(cur); cur = ''; continue; }
-      cur += c;
-    }
-    vals.push(cur);
-    return {
-      id: idx + 1,
-      rating: parseInt(vals[1]) || 3,
-      title: vals[2] || 'Review',
-      text: vals[3] || '',
-      date: vals[4] || '',
-      platform: vals[5] || 'Android'
-    };
-  });
+  // Try to load from Vercel Blob first (auto-updated)
+  // Fall back to static CSV
+  const urls = [
+    process.env.VITE_BLOB_CSV_URL,  // auto-updated
+    '/groww_real_reviews.csv'         // static fallback
+  ].filter(Boolean);
 
-  const totalScraped = allReviews.length;
-  const withText = allReviews.filter(r => r.text.length > 0);
+  for (const url of urls) {
+    try {
+      const res = await fetch(url);
+      if (res.ok) {
+        const text = await res.text();
+        const lines = text.trim().split('\n');
+        
+        const allReviews = lines.slice(1).map((line, idx) => {
+          const vals = [];
+          let cur = '', inQ = false;
+          for (let c of line) {
+            if (c === '"') { inQ = !inQ; continue; }
+            if (c === ',' && !inQ) { vals.push(cur); cur = ''; continue; }
+            cur += c;
+          }
+          vals.push(cur);
+          return {
+            id: idx + 1,
+            rating: parseInt(vals[1]) || 3,
+            title: vals[2] || 'Review',
+            text: vals[3] || '',
+            date: vals[4] || '',
+            platform: vals[5] || 'Android'
+          };
+        });
+
+        const totalScraped = allReviews.length;
+        const withText = allReviews.filter(r => r.text.length > 0);
+        
+        console.log(`Total scraped: ${totalScraped}, With text: ${withText.length}`);
+        
+        // Return object with both counts
+        return { reviews: withText, totalScraped };
+      }
+    } catch (e) {
+      continue;
+    }
+  }
   
-  console.log(`Total scraped: ${totalScraped}, With text: ${withText.length}`);
-  
-  // Return object with both counts
-  return { reviews: withText, totalScraped };
+  throw new Error('Failed to load reviews from any source');
 }
 
 export const THEMES = [

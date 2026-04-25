@@ -1,18 +1,20 @@
 import React from 'react';
 
-const WeeklyPulse = ({
-  pulseData,
-  loading,
-  progress,
-  themeCounts,
-  totalReviews,
+const WeeklyPulse = ({ 
+  pulseData, 
+  loading, 
+  progress, 
+  themeCounts, 
+  processedReviews, 
+  totalReviews, 
   avgRating,
   negativeCount,
   weekLabel,
   onGeneratePulse,
-  onEmail,
   onExportPDF,
-  error
+  onEmail,
+  error,
+  isMobile 
 }) => {
 
   if (loading) {
@@ -127,9 +129,9 @@ const WeeklyPulse = ({
       </div>
 
       {/* Headline card */}
-      <div style={{ backgroundColor: '#1a1a2e', color: 'white', padding: '32px', borderRadius: '12px', marginBottom: '24px' }}>
-        <h2 style={{ fontSize: '26px', fontWeight: '700', margin: '0 0 12px 0', fontFamily: 'Georgia, serif' }}>{pulseData.headline}</h2>
-        <p style={{ fontSize: '15px', lineHeight: '1.6', margin: '0 0 20px 0', opacity: 0.85 }}>{pulseData.summary}</p>
+      <div style={{ backgroundColor: '#1a1a2e', color: 'white', padding: isMobile ? '20px 16px' : '32px', borderRadius: '12px', marginBottom: '24px' }}>
+        <h2 style={{ fontSize: isMobile ? '20px' : '26px', fontWeight: '700', margin: '0 0 12px 0', fontFamily: 'Georgia, serif' }}>{pulseData.headline}</h2>
+        <p style={{ fontSize: isMobile ? '13px' : '15px', lineHeight: '1.6', margin: '0 0 20px 0', opacity: 0.85 }}>{pulseData.summary}</p>
         <div style={{ display: 'flex', gap: '20px', fontSize: '13px', opacity: 0.7 }}>
           <span>{totalReviews?.toLocaleString()} reviews analyzed</span>
           <span>•</span>
@@ -140,7 +142,7 @@ const WeeklyPulse = ({
       </div>
 
       {/* Two column: Themes + Quotes */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
         {/* Top Themes */}
         <div style={{ backgroundColor: 'white', borderRadius: '12px', padding: '24px', border: '1px solid #E5E7EB' }}>
           <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#1a1a2e', marginBottom: '20px', margin: '0 0 20px 0' }}>Top Themes (Top 3)</h3>
@@ -179,7 +181,7 @@ const WeeklyPulse = ({
       {/* Recommended Actions */}
       <div style={{ backgroundColor: 'white', borderRadius: '12px', padding: '24px', border: '1px solid #E5E7EB', marginBottom: '20px' }}>
         <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#1a1a2e', margin: '0 0 20px 0' }}>Recommended Actions (Top 3)</h3>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: '16px' }}>
           {topActions.map((action, i) => (
             <div key={i} style={{ padding: '20px', backgroundColor: '#F9FAFB', borderRadius: '8px', border: '1px solid #E5E7EB' }}>
               <div style={{ fontSize: '24px', marginBottom: '10px' }}>{action.icon}</div>

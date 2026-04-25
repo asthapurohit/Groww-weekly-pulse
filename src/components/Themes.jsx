@@ -9,7 +9,7 @@ const themeDescriptions = {
   'app-ux-support': 'Reviews about app performance, crashes, UI design, customer support quality, and general feedback.'
 };
 
-const Themes = ({ themeCounts, totalReviews, processedReviews }) => {
+const Themes = ({ themeCounts, totalReviews, processedReviews, isMobile }) => {
   const [selectedTheme, setSelectedTheme] = useState(null);
 
   const chartData = (themeCounts || []).map(theme => ({
@@ -67,14 +67,14 @@ const Themes = ({ themeCounts, totalReviews, processedReviews }) => {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '24px' }}>
 
         {/* Left: Donut Chart */}
         <div style={{ backgroundColor: 'white', borderRadius: '12px', padding: '32px', border: '1px solid #E5E7EB' }}>
           <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#1a1a2e', marginBottom: '24px', textAlign: 'center' }}>
             Theme Distribution
           </h2>
-          <ResponsiveContainer width="100%" height={280}>
+          <ResponsiveContainer width="100%" height={isMobile ? 250 : 280}>
             <PieChart>
               <Pie
                 data={chartData}

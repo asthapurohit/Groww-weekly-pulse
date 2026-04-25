@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Reports = () => {
+const Reports = ({ isMobile }) => {
   // Fake previous reports data
   const previousReports = [
     {
@@ -119,7 +119,7 @@ const Reports = () => {
         
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
+          gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
           gap: '24px'
         }}>
           {exportCards.map((card) => (
@@ -246,153 +246,234 @@ const Reports = () => {
           overflow: 'hidden',
           boxShadow: '0 1px 3px rgba(0,0,0,0.08)'
         }}>
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style={{ backgroundColor: '#F9FAFB', borderBottom: '1px solid #E5E7EB' }}>
-                  <th style={{
-                    padding: '16px 24px',
-                    textAlign: 'left',
-                    fontSize: '12px',
-                    fontWeight: '600',
-                    color: '#6B7280',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em'
-                  }}>
-                    Report Name
-                  </th>
-                  <th style={{
-                    padding: '16px 24px',
-                    textAlign: 'left',
-                    fontSize: '12px',
-                    fontWeight: '600',
-                    color: '#6B7280',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em'
-                  }}>
-                    Date
-                  </th>
-                  <th style={{
-                    padding: '16px 24px',
-                    textAlign: 'left',
-                    fontSize: '12px',
-                    fontWeight: '600',
-                    color: '#6B7280',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em'
-                  }}>
-                    Format
-                  </th>
-                  <th style={{
-                    padding: '16px 24px',
-                    textAlign: 'left',
-                    fontSize: '12px',
-                    fontWeight: '600',
-                    color: '#6B7280',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em'
-                  }}>
-                    Size
-                  </th>
-                  <th style={{
-                    padding: '16px 24px',
-                    textAlign: 'center',
-                    fontSize: '12px',
-                    fontWeight: '600',
-                    color: '#6B7280',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em'
-                  }}>
-                    Download
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {previousReports.map((report, index) => (
-                  <tr
-                    key={index}
-                    style={{
-                      borderBottom: index < previousReports.length - 1 ? '1px solid #F3F4F6' : 'none',
-                      transition: 'background-color 0.2s ease'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = '#F9FAFB';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = 'white';
-                    }}
-                  >
-                    <td style={{ padding: '16px 24px' }}>
-                      <div style={{
-                        fontSize: '14px',
-                        color: '#374151',
-                        fontWeight: '500'
-                      }}>
-                        {report.name}
-                      </div>
-                    </td>
-                    <td style={{ padding: '16px 24px' }}>
-                      <div style={{
-                        fontSize: '14px',
+          {isMobile ? (
+            <div style={{ padding: '16px' }}>
+              {previousReports.map((report, index) => (
+                <div
+                  key={index}
+                  style={{
+                    padding: '16px',
+                    backgroundColor: 'white',
+                    borderRadius: '8px',
+                    border: index < previousReports.length - 1 ? '1px solid #E5E7EB' : 'none',
+                    marginBottom: index < previousReports.length - 1 ? '12px' : '0'
+                  }}
+                >
+                  <div style={{ marginBottom: '12px' }}>
+                    <div style={{
+                      fontSize: '14px',
+                      color: '#374151',
+                      fontWeight: '600',
+                      marginBottom: '8px'
+                    }}>
+                      {report.name}
+                    </div>
+                    <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                      <span style={{
+                        fontSize: '12px',
                         color: '#6B7280'
                       }}>
-                        {report.date}
-                      </div>
-                    </td>
-                    <td style={{ padding: '16px 24px' }}>
-                      <div style={{
+                        📅 {report.date}
+                      </span>
+                      <span style={{
                         display: 'inline-block',
-                        padding: '4px 8px',
+                        padding: '2px 6px',
                         borderRadius: '4px',
-                        fontSize: '12px',
+                        fontSize: '11px',
                         fontWeight: '500',
                         backgroundColor: '#F3F4F6',
                         color: '#374151'
                       }}>
                         {report.format}
-                      </div>
-                    </td>
-                    <td style={{ padding: '16px 24px' }}>
-                      <div style={{
-                        fontSize: '14px',
+                      </span>
+                      <span style={{
+                        fontSize: '12px',
                         color: '#6B7280'
                       }}>
-                        {report.size}
-                      </div>
-                    </td>
-                    <td style={{ padding: '16px 24px', textAlign: 'center' }}>
-                      <button
-                        onClick={() => handleDownloadPrevious(report)}
-                        style={{
-                          padding: '8px 12px',
-                          backgroundColor: '#1a1a2e',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '6px',
+                        📁 {report.size}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => handleDownloadPrevious(report)}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      backgroundColor: '#1a1a2e',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px',
+                      transition: 'background-color 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#374151';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = '#1a1a2e';
+                    }}
+                  >
+                    <span>⬇️</span>
+                    Download
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ backgroundColor: '#F9FAFB', borderBottom: '1px solid #E5E7EB' }}>
+                    <th style={{
+                      padding: '16px 24px',
+                      textAlign: 'left',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      color: '#6B7280',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em'
+                    }}>
+                      Report Name
+                    </th>
+                    <th style={{
+                      padding: '16px 24px',
+                      textAlign: 'left',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      color: '#6B7280',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em'
+                    }}>
+                      Date
+                    </th>
+                    <th style={{
+                      padding: '16px 24px',
+                      textAlign: 'left',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      color: '#6B7280',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em'
+                    }}>
+                      Format
+                    </th>
+                    <th style={{
+                      padding: '16px 24px',
+                      textAlign: 'left',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      color: '#6B7280',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em'
+                    }}>
+                      Size
+                    </th>
+                    <th style={{
+                      padding: '16px 24px',
+                      textAlign: 'center',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      color: '#6B7280',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em'
+                    }}>
+                      Download
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {previousReports.map((report, index) => (
+                    <tr
+                      key={index}
+                      style={{
+                        borderBottom: index < previousReports.length - 1 ? '1px solid #F3F4F6' : 'none',
+                        transition: 'background-color 0.2s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#F9FAFB';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'white';
+                      }}
+                    >
+                      <td style={{ padding: '16px 24px' }}>
+                        <div style={{
+                          fontSize: '14px',
+                          color: '#374151',
+                          fontWeight: '500'
+                        }}>
+                          {report.name}
+                        </div>
+                      </td>
+                      <td style={{ padding: '16px 24px' }}>
+                        <div style={{
+                          fontSize: '14px',
+                          color: '#6B7280'
+                        }}>
+                          {report.date}
+                        </div>
+                      </td>
+                      <td style={{ padding: '16px 24px' }}>
+                        <div style={{
+                          display: 'inline-block',
+                          padding: '4px 8px',
+                          borderRadius: '4px',
                           fontSize: '12px',
                           fontWeight: '500',
-                          cursor: 'pointer',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          transition: 'background-color 0.2s ease'
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = '#374151';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = '#1a1a2e';
-                        }}
-                      >
-                        <span>⬇️</span>
-                        Download
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                          backgroundColor: '#F3F4F6',
+                          color: '#374151'
+                        }}>
+                          {report.format}
+                        </div>
+                      </td>
+                      <td style={{ padding: '16px 24px' }}>
+                        <div style={{
+                          fontSize: '14px',
+                          color: '#6B7280'
+                        }}>
+                          {report.size}
+                        </div>
+                      </td>
+                      <td style={{ padding: '16px 24px', textAlign: 'center' }}>
+                        <button
+                          onClick={() => handleDownloadPrevious(report)}
+                          style={{
+                            padding: '8px 12px',
+                            backgroundColor: '#1a1a2e',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '6px',
+                            fontSize: '12px',
+                            fontWeight: '500',
+                            cursor: 'pointer',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            transition: 'background-color 0.2s ease'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = '#374151';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = '#1a1a2e';
+                          }}
+                        >
+                          <span>⬇️</span>
+                          Download
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
     </div>
