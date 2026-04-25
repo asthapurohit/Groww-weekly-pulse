@@ -6,14 +6,46 @@ async function callGemini(prompt) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.3, maxOutputTokens: 2000 }
+      generationConfig: { 
+        temperature: 0.3, 
+        maxOutputTokens: 4000,
+        responseMimeType: "application/json"
+      }
     })
   });
+  
   const data = await res.json();
+  
+  if (!res.ok) {
+    throw new Error(`Gemini API error: ${data.error?.message || res.status}`);
+  }
+  
   const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-  const first = text.indexOf('{');
-  const last = text.lastIndexOf('}');
-  return JSON.parse(text.substring(first, last + 1));
+  console.log('Gemini raw response length:', text.length);
+  console.log('Gemini response preview:', text.substring(0, 200));
+  
+  // Clean and extract JSON
+  const cleaned = text
+    .replace(/```json/g, '')
+    .replace(/```/g, '')
+    .trim();
+  
+  const first = cleaned.indexOf('{');
+  const last = cleaned.lastIndexOf('}');
+  
+  if (first === -1 || last === -1) {
+    throw new Error('No JSON object found in Gemini response');
+  }
+  
+  const jsonStr = cleaned.substring(first, last + 1);
+  
+  try {
+    return JSON.parse(jsonStr);
+  } catch(e) {
+    console.error('JSON parse failed:', e.message);
+    console.error('JSON string:', jsonStr.substring(0, 500));
+    throw new Error('Failed to parse Gemini response as JSON');
+  }
 }
 
 export async function generatePulse({ topThemes, sampleReviews, totalReviews, avgRating, negativeCount, weekLabel }) {
@@ -22,7 +54,7 @@ Analyze these reviews and return ONLY a JSON object, no markdown:
 
 Top 3 themes: ${topThemes.map((t,i) => `${i+1}. ${t.name} - ${t.count} reviews, avg ${t.avgRating}/5`).join('; ')}
 Total: ${totalReviews} reviews | Avg: ${avgRating}/5 | Negative: ${negativeCount}
-Sample reviews: ${sampleReviews.map(r => `[${r.theme?.label}] ★${r.rating}: ${r.text?.substring(0,100)}`).join('\n')}
+Sample reviews: ${sampleReviews.slice(0, 8).map(r => `★${r.rating}: ${r.text?.substring(0,60)}`).join('\n')}
 
 Return this exact JSON structure:
 {
