@@ -57,6 +57,11 @@ export async function loadReviews() {
     }
   }
   
+  console.log('loadReviews returning:', {
+    reviewCount: withText.length,
+    totalScraped
+  });
+  
   throw new Error('Failed to load reviews from any source');
 }
 

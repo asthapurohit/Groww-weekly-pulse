@@ -81,12 +81,67 @@ const [loadingStep, setLoadingStep] = useState(0);
   const [lastUpdated, setLastUpdated] = useState(null);
 
   useEffect(() => {
-  loadReviews().then(async ({ reviews: rawReviews, totalScraped, lastUpdated }) => {
-    setDataLoading(true);
-    
-    // Step 1: Load reviews
-    setLoadingStep(0);
-    console.log('Loaded reviews:', rawReviews.length);
+    loadReviews().then(async ({ reviews: rawReviews, totalScraped }) => {
+      console.log('=== DATA LOAD DEBUG ===');
+      console.log('totalScraped:', totalScraped);
+      console.log('rawReviews length:', rawReviews.length);
+      console.log('first review:', rawReviews[0]);
+      console.log('last review:', rawReviews[rawReviews.length-1]);
+      
+      setDataLoading(true);
+      
+      // Step 1: Load reviews
+      setLoadingStep(0);
+      console.log('Loaded reviews:', rawReviews.length);
+      
+      // Step 2: AI classify all reviews
+      setLoadingStep(1);
+      console.log('Starting AI theme classification...');
+      const classifications = await classifyReviewsWithAI(rawReviews);
+      
+      // Step 3: Map classifications back to reviews
+      setLoadingStep(2);
+      const classMap = {};
+      classifications.forEach(c => { classMap[c.id] = c.themeId; });
+      
+      const reviewsWithThemes = rawReviews.map(r => ({
+        ...r,
+        theme: THEMES.find(t => t.id === classMap[r.id]) || THEMES[4]
+      }));
+      
+      // Step 4: Compute stats
+      setLoadingStep(3);
+      const total = reviewsWithThemes.length;
+      const avg = (reviewsWithThemes.reduce((s,r) => s + r.rating, 0) / total).toFixed(1);
+      const negative = reviewsWithThemes.filter(r => r.rating <= 2).length;
+      
+      const themeStats = THEMES.map(theme => {
+        const group = reviewsWithThemes.filter(r => r.theme.id === theme.id);
+        const avgR = group.length
+          ? (group.reduce((s,r) => s + r.rating, 0) / group.length).toFixed(1)
+          : '0.0';
+        return { ...theme, count: group.length, avgRating: avgR };
+      }).sort((a, b) => b.count - a.count);
+      
+      setProcessedReviews(reviewsWithThemes);
+      setThemeCounts(themeStats);
+      setTotalReviews(totalScraped);        // shows 1,499 on dashboard
+      setAnalysedCount(rawReviews.length);  // shows 1,000 in analysis
+      setAvgRating(avg);
+      setNegativeCount(negative);
+      
+      console.log('totalReviews set to:', total);
+      console.log('avgRating set to:', avg);
+      console.log('negativeCount set to:', negative);
+      console.log('themeStats:', themeStats);
+      
+      setDataLoading(false);
+      
+    }).catch(err => {
+      setError('Failed to load: ' + err.message);
+      setDataLoading(false);
+    });
+  }, []);
     
     // Step 2: AI classify all reviews
     setLoadingStep(1);
